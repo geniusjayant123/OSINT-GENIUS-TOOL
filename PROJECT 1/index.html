@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OSINT GENIUS — Intelligence Platform</title>
+  <meta name="description" content="OSINT GENIUS — A professional-grade open source intelligence platform with 16 investigation modules including IP lookup, email OSINT, domain analysis, and more." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Leaflet Maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/modules.css" />
+
+  <style>
+    /* Override Leaflet dark popup */
+    .leaflet-popup-content-wrapper { background:#0f0f1a; border:1px solid rgba(0,212,255,0.3); color:#e0e0f0; border-radius:8px; }
+    .leaflet-popup-tip { background:#0f0f1a; }
+    .leaflet-popup-content { font-family:'JetBrains Mono',monospace; font-size:0.78rem; }
+    .leaflet-control-zoom a { background:#0f0f1a !important; border-color:rgba(0,212,255,0.3) !important; color:#00d4ff !important; }
+    .leaflet-control-zoom a:hover { background:rgba(0,212,255,0.1) !important; }
+  </style>
+</head>
+<body>
+
+<!-- ================================================================
+     INTRO / BOOT SCREEN
+     ================================================================ -->
+<div id="intro-screen">
+  <!-- Particle background -->
+  <div class="intro-particles" id="intro-particles"></div>
+
+  <!-- Background grid -->
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.04) 1px,transparent 1px);background-size:60px 60px;"></div>
+
+  <div class="intro-content">
+    <!-- Logo -->
+    <div class="intro-logo-wrap">
+      <img src="assets/logo.jpg" alt="OSINT GENIUS" class="intro-logo" />
+      <div class="intro-logo-ring"></div>
+      <div class="intro-logo-ring-2"></div>
+      <span class="corner corner-tl"></span>
+      <span class="corner corner-tr"></span>
+      <span class="corner corner-bl"></span>
+      <span class="corner corner-br"></span>
+    </div>
+
+    <!-- Title -->
+    <div class="intro-title glitch-text" data-text="OSINT GENIUS">
+      <span class="t-cyan">OSINT</span> GENIUS
+    </div>
+    <div class="intro-tagline">&#x2022; Open Source Intelligence Platform &#x2022;</div>
+
+    <!-- Boot Terminal -->
+    <div class="intro-terminal">
+      <div class="boot-line"><span class="boot-prefix">[SYS]</span>&nbsp;<span class="boot-info">Initializing OSINT GENIUS v1.0.0...</span></div>
+      <div class="boot-line"><span class="boot-prefix">[OK] </span>&nbsp;<span class="boot-ok">Core engine loaded</span></div>
+      <div class="boot-line"><span class="boot-prefix">[OK] </span>&nbsp;<span class="boot-ok">16 intelligence modules registered</span></div>
+      <div class="boot-line"><span class="boot-prefix">[OK] </span>&nbsp;<span class="boot-ok">API endpoints configured</span></div>
+      <div class="boot-line"><span class="boot-prefix">[OK] </span>&nbsp;<span class="boot-ok">Leaflet maps engine ready</span></div>
+      <div class="boot-line"><span class="boot-prefix">[OK] </span>&nbsp;<span class="boot-ok">Cryptography module online</span></div>
+      <div class="boot-line"><span class="boot-prefix">[..] </span>&nbsp;<span class="boot-warn">Connecting to threat intelligence feeds...</span></div>
+      <div class="boot-line"><span class="boot-prefix">[OK] </span>&nbsp;<span class="boot-ok">All systems operational &mdash; Welcome, Analyst</span></div>
+    </div>
+
+    <!-- Progress -->
+    <div class="intro-progress-wrap">
+      <div class="intro-progress-label">
+        <span>LOADING INTELLIGENCE SYSTEMS</span>
+        <span id="intro-pct">0%</span>
+      </div>
+      <div class="intro-progress-track">
+        <div class="intro-progress-fill" id="intro-progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- Access granted -->
+    <div class="intro-access" id="intro-access">&#x25BA;&nbsp; ACCESS GRANTED</div>
+    <div style="font-size:0.68rem;color:rgba(0, 212, 255, 0.4);text-align:center;font-family:'JetBrains Mono',monospace;margin-top:20px;letter-spacing:0.12em;">
+      CREATED BY JAYANT GUPTA
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     LOGIN SCREEN
+     ================================================================ -->
+<div id="login-screen" style="display:none;">
+  <div class="login-container">
+    <div class="login-logo-wrap">
+      <img src="assets/logo.jpg" alt="OSINT GENIUS" class="login-logo" />
+    </div>
+    <div class="login-title">AUTHENTICATION REQUIRED</div>
+    <div class="login-subtitle">OSINT GENIUS SECURE ACCESS GATEWAY</div>
+    
+    <div class="card login-card">
+      <div class="mb-12">
+        <label class="form-label">User ID / Handle</label>
+        <div class="input-wrap">
+          <i class="fas fa-user input-icon"></i>
+          <input class="form-input has-icon" id="login-uid" placeholder="••••••••" />
+        </div>
+      </div>
+      <div class="mb-16">
+        <label class="form-label">Access Code</label>
+        <div class="input-wrap">
+          <i class="fas fa-lock input-icon"></i>
+          <input class="form-input has-icon" id="login-pwd" type="password" placeholder="•••••" />
+        </div>
+      </div>
+      <button class="btn btn-primary w-full" id="login-submit-btn"><i class="fas fa-sign-in-alt"></i> ESTABLISH SESSION</button>
+      <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);text-align:center;font-family:'JetBrains Mono',monospace;margin-top:16px;letter-spacing:0.1em;text-transform:uppercase;">
+        Created by Jayant Gupta
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     CLEARANCE SCREEN
+     ================================================================ -->
+<div id="clearance-screen" style="display:none;">
+  <div class="clearance-content">
+    <div class="clearance-glitch"><i class="fas fa-shield-alt fa-spin"></i></div>
+    <div class="clearance-title">VERIFYING CLEARANCE</div>
+    <div class="clearance-terminal" id="clearance-log"></div>
+    <div class="progress-bar" style="width: 320px; margin-top: 15px;"><div class="progress-fill" id="clearance-progress-fill" style="width: 0%;"></div></div>
+  </div>
+</div>
+
+<!-- ================================================================
+     MAIN APP SHELL
+     ================================================================ -->
+<div class="bg-grid"></div>
+<div class="bg-radial"></div>
+
+<div id="app" style="display:none;">
+  <!-- ── TOP BAR ── -->
+  <header class="topbar">
+    <a class="topbar-brand" href="#">
+      <img src="assets/logo.jpg" alt="OSINT GENIUS" class="topbar-logo" />
+      <span class="topbar-title"><span>OSINT</span> GENIUS</span>
+    </a>
+
+    <div class="topbar-right">
+      <div class="topbar-status">
+        <span class="status-dot"></span>
+        <span>ONLINE</span>
+      </div>
+      <div class="topbar-time" id="topbar-clock">00:00:00</div>
+      <button class="topbar-btn" id="menu-toggle" title="Toggle Sidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+      <button class="topbar-btn" title="Settings" onclick="App.navigateTo('dashboard', 'security')">
+        <i class="fas fa-cog"></i>
+      </button>
+      <button class="topbar-btn" id="logout-btn" title="Logout" onclick="App.logout()">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── SIDEBAR ── -->
+  <nav class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Main</div>
+      <div class="nav-item active" data-module="dashboard">
+        <span class="nav-icon"><i class="fas fa-th-large"></i></span>
+        <span>Dashboard</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Core Modules</div>
+      <div class="nav-item" data-module="ip">
+        <span class="nav-icon"><i class="fas fa-network-wired"></i></span>
+        <span>IP Intelligence</span>
+      </div>
+      <div class="nav-item" data-module="email">
+        <span class="nav-icon"><i class="fas fa-envelope"></i></span>
+        <span>Email OSINT</span>
+      </div>
+      <div class="nav-item" data-module="domain">
+        <span class="nav-icon"><i class="fas fa-globe"></i></span>
+        <span>Domain Intel</span>
+      </div>
+      <div class="nav-item" data-module="username">
+        <span class="nav-icon"><i class="fas fa-user-secret"></i></span>
+        <span>Username OSINT</span>
+      </div>
+      <div class="nav-item" data-module="phone">
+        <span class="nav-icon"><i class="fas fa-mobile-alt"></i></span>
+        <span>Phone Intel</span>
+      </div>
+      <div class="nav-item" data-module="geo">
+        <span class="nav-icon"><i class="fas fa-map-marked-alt"></i></span>
+        <span>Geo &amp; Maps</span>
+      </div>
+      <div class="nav-item" data-module="crypto">
+        <span class="nav-icon"><i class="fas fa-hashtag"></i></span>
+        <span>Hash &amp; Crypto</span>
+      </div>
+      <div class="nav-item" data-module="file">
+        <span class="nav-icon"><i class="fas fa-file-alt"></i></span>
+        <span>File Intel</span>
+      </div>
+      <div class="nav-item" data-module="darkweb">
+        <span class="nav-icon"><i class="fas fa-spider"></i></span>
+        <span>Dark Web Monitor</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Power Modules</div>
+      <div class="nav-item" data-module="dorking">
+        <span class="nav-icon"><i class="fas fa-search"></i></span>
+        <span>Google Dorking</span>
+        <span class="nav-badge new">NEW</span>
+      </div>
+      <div class="nav-item" data-module="cve">
+        <span class="nav-icon"><i class="fas fa-shield-alt"></i></span>
+        <span>CVE Intel</span>
+        <span class="nav-badge new">NEW</span>
+      </div>
+      <div class="nav-item" data-module="person">
+        <span class="nav-icon"><i class="fas fa-user-tie"></i></span>
+        <span>Person Profiler</span>
+        <span class="nav-badge new">NEW</span>
+      </div>
+      <div class="nav-item" data-module="threat">
+        <span class="nav-icon"><i class="fas fa-radiation"></i></span>
+        <span>Threat Intel</span>
+        <span class="nav-badge new">NEW</span>
+      </div>
+      <div class="nav-item" data-module="urlanalyzer">
+        <span class="nav-icon"><i class="fas fa-link"></i></span>
+        <span>URL Analyzer</span>
+        <span class="nav-badge new">NEW</span>
+      </div>
+      <div class="nav-item" data-module="network">
+        <span class="nav-icon"><i class="fas fa-project-diagram"></i></span>
+        <span>Network Tools</span>
+        <span class="nav-badge new">NEW</span>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div style="font-size:0.68rem;color:var(--text-muted);text-align:center;font-family:'JetBrains Mono',monospace;line-height:1.6;">
+        OSINT GENIUS v1.0<br/>
+        <span style="color:var(--green);">&#9679;</span> 16 Modules Active<br/>
+        <span style="font-size:0.62rem;color:rgba(255,255,255,0.45);">Created by Jayant Gupta</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="main-content">
+    <div id="main-content" style="padding:24px;">
+      <!-- Modules render here -->
+    </div>
+  </main>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<!-- ================================================================
+     JAVASCRIPT — Load Order Matters
+     ================================================================ -->
+<!-- Utilities -->
+<script src="js/utils/api.js"></script>
+<script src="js/utils/storage.js"></script>
+<script src="js/utils/report.js"></script>
+
+<!-- Modules -->
+<script src="js/modules/dashboard.js"></script>
+<script src="js/modules/ip.js"></script>
+<script src="js/modules/email.js"></script>
+<script src="js/modules/domain.js"></script>
+<script src="js/modules/username.js"></script>
+<script src="js/modules/phone.js"></script>
+<script src="js/modules/geo.js"></script>
+<script src="js/modules/crypto.js"></script>
+<script src="js/modules/file.js"></script>
+<script src="js/modules/darkweb.js"></script>
+<script src="js/modules/dorking.js"></script>
+<script src="js/modules/cve.js"></script>
+<script src="js/modules/person.js"></script>
+<script src="js/modules/threat.js"></script>
+<script src="js/modules/urlanalyzer.js"></script>
+<script src="js/modules/network.js"></script>
+
+<!-- App (last) -->
+<script src="js/app.js"></script>
+
+<script>
+  // Generate intro particles
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('intro-particles');
+    for (let i = 0; i < 60; i++) {
+      const p = document.createElement('div');
+      p.className = 'intro-particle';
+      p.style.cssText = `
+        left:${Math.random()*100}%;
+        top:${Math.random()*100}%;
+        width:${Math.random()*3+1}px;
+        height:${Math.random()*3+1}px;
+        opacity:${Math.random()*0.5+0.1};
+        --dur:${Math.random()*6+4}s;
+        --delay:${Math.random()*4}s;
+      `;
+      container.appendChild(p);
+    }
+  });
+</script>
+
+</body>
+</html>
