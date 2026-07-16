@@ -4,5 +4,5 @@ IP Offset Verification: Highlights your advanced GPS geolocation alignment ( Luc
 16 Modules Glossary: Quick descriptions of every tool included in the app.
 Offline Sandbox Highlights: Mentions the local file analyzer, magic bytes inspector, EXIF decoder, and offline hash calculator.
 Setup Instructions: Steps on how users can clone the repo and run it instantly by clicking the index.html file
-id- guest
+id- genius
 password- 12345
